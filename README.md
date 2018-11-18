@@ -1,7 +1,5 @@
 Z80 PIO bit mode test program for CP/M
 
-Assemble with SLR Systems Z80ASM
-
 Version 20-Oct-2018 
 Phil Summers
 difficultylevelhigh@gmail.com
