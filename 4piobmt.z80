@@ -1,0 +1,241 @@
+;
+; Z80 PIO BIT MODE TEST PROGRAM
+;
+; Assemble with SLR Systems Z80ASM
+;
+; Version 20-Oct-2018 
+; Phil Summers
+; difficultylevelhigh@gmail.com
+;
+; PIOBAS defines the base address of the PIO chip
+;
+; PIOCNT defines the number of chips to test.
+;
+; A1A0 defines the layout of the ports and this is
+; driven by how Z80 address lines A0 & A1 are 
+; connected to the Z80 PIO PORTSEL line Pin 6 
+; and CONTSEL Pin 5.
+;
+; A1A0 = 0
+;
+; PIOBAS+00h pio port A data
+; PIOBAS+01h pio port A control
+; PIOBAS+02h pio port B data
+; PIOBAS+03h pio port B control
+;
+; A1A0 = 1
+;
+; PIOBAS+00h pio port A data
+; PIOBAS+01h pio port B data
+; PIOBAS+02h pio port A control
+; PIOBAS+03h pio port B control
+;
+; Default test pattern for each port is:
+; 
+; 1 Toggle all bits on and off. 
+; 2 Toggle each bit on and off.
+; 3 Toggle alternate bits on and off. 
+;
+A1A0	EQU	0		
+PIOCNT	EQU	4
+PIOBAS	EQU	90H
+;
+BDOS	EQU	0005H
+BDOUT	EQU	09H	
+CR	EQU	0DH
+LF	EQU	0AH
+;
+	LD	DE,MSGBEG	; HELLO
+	CALL	PSTRIN
+;
+; CYCLE THROUGH ALL PIO'S
+;
+	LD	B,PIOCNT
+	LD	C,PIOBAS
+LP1:	CALL	TST1CH
+	CALL	TST1CH
+IF	A1A0
+	INC	C
+	INC	C
+ENDIF
+	DJNZ	LP1
+	
+BYE:	LD	DE,MSGEND	; GOODBYE
+	CALL	PSTRIN	
+	RET
+;
+; TEST ONE CHANNEL C = PORT 
+;	
+TST1CH:	LD	DE,PIONUM
+	CALL	PSTRIN
+	LD	A,PIOCNT
+	SUB	B
+	CALL	OUTB
+	LD	DE,PORTNUM
+	CALL	PSTRIN
+	LD	A,C
+	CALL	OUTB
+	CALL	PIOINIT
+	CALL	PIOTST
+IF	A1A0
+	INC	C
+ELSE
+	INC	C
+	INC	C
+ENDIF	
+	RET	 
+;
+; OUTPUT THE TABLE OF BYTES TO PORT C
+;
+PIOTST:	PUSH	BC
+	LD	B,TSTPAT-TSTBEG
+	LD	HL,TSTPAT
+LP2:	LD	A,(HL)
+	OUT	(C),A
+	CALL	OUTB
+	CALL	PAUSE
+	CALL	PAUSE
+	DEC	HL
+	DEC	B
+	JR	NZ,LP2
+	CALL	CRLF
+	POP	BC	
+	RET
+;
+; PAUSE
+;
+PAUSE:	PUSH	DE
+	PUSH	BC	
+   	LD      D,0FFH
+LP3:    LD      B,0FFH
+LP4:	DJNZ    LP4
+        DEC     D
+        JR      NZ,LP3
+        POP	BC
+        POP	DE
+	RET
+;
+; INITIALIZE PIO MODE 3 OUTPUT
+;
+PIOINIT:
+
+IF	A1A0
+	INC	C
+	INC	C
+ELSE	
+	INC	C	
+ENDIF
+        LD      A,0CFH
+        OUT     (C),A		; PIOAC
+        LD      A,00H      
+        OUT     (C),A		; PIOAC
+
+IF	A1A0
+	DEC	C
+	DEC	C
+ELSE    
+	DEC	C
+ENDIF
+	RET
+;
+; OUTPUT SPACE
+;
+OUTSPC:	LD	E,20H
+	CALL	PCHAR
+	RET
+;
+; OUTPUT CR+LF
+;
+CRLF:	LD	E,CR
+	CALL	PCHAR
+	LD	E,LF
+	CALL	PCHAR
+	RET
+;
+; OUTPUT BYTE A
+;	
+OUTB:	PUSH	AF
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	AND	0FH
+	CALL	HBTHE
+	POP	AF
+	AND	0FH
+	CALL	HBTHE
+	CALL	OUTSPC
+	RET
+;
+;Output HALF-BYTE
+;****************
+;
+;PARAMETER: Entry Half-BYTE IN A (BIT 0 - 3)
+;*********
+;
+HBTHE:	CP 	0AH
+	JR	C,HBTHE1
+	ADD	A,7
+HBTHE1:	ADD	A,30H
+	LD	E,A
+	CALL	PCHAR
+	RET
+;
+; PRINT A CHARACTER 
+;
+PCHAR:	PUSH	BC
+	LD	C,02H
+	JR	BDO
+PSTRIN:	PUSH	BC
+	LD	C,09H
+	JR	BDO
+;
+; CP/M BDOS CALL
+;
+BDO:	PUSH	HL
+	PUSH	DE
+	PUSH	IX
+	PUSH	IY
+	CALL	BDOS
+	POP	IY
+	POP	IX
+	POP	DE
+	POP	HL
+	POP	BC
+	RET
+
+MSGBEG:	DB	'CP/M Z80 PIO BIT MODE TEST.',CR,LF,'$'
+MSGEND:	DB	'TEST COMPLETE.',CR,LF,'$'
+PIONUM:	DB	'PIO $'
+PORTNUM:DB	'PORT $'
+
+TSTBEG	EQU	$-1
+	DB	0FFH
+        DB      55H
+        DB      0AAH
+        DB      55H
+        DB      0AAH
+	DB	55H
+	DB	0AAH
+	DB	55H
+	DB	0AAH
+	DB	00H
+	DB	01H
+	DB	02H
+	DB	04H
+	DB	08H
+	DB	10H
+	DB	20H
+	DB	40H
+	DB	80H
+	DB	00H
+	DB	0FFH
+	DB	00H
+	DB	0FFH
+	DB	00H
+	DB	0FFH
+	DB	00H
+TSTPAT:	DB	0FFH	
+
+        END
+
