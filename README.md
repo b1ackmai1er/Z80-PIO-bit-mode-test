@@ -1,4 +1,5 @@
-Z80 PIO bit mode test program for CP/M
+4piobmt.z80 - Z80 PIO bit mode test program for CP/M
+----------------------------------------------------
 
 Version 20-Oct-2018 
 Phil Summers
@@ -20,4 +21,24 @@ https://www.retrobrewcomputers.org/doku.php?id=boards:ecb:zilog-peripherals:star
 https://www.retrobrewcomputers.org/doku.php?id=boards:ecb:4pio:start
 
 Should work with any Z80 system with appropriate configuration.
+
+piociotst.asm - Z80 PIO bit mode test program for CP/M ROMWBW HBIOS - ECB-4PIO board
+------------------------------------------------------------------------------------
+
+Version 20-Nov-2018 
+Phil Summers
+difficultylevelhigh@gmail.com
+
+This is generic test program for ROMWBW with pio.asm driver - currently not submitted to ROMWBW master.
+
+Set the unit number which are displayed as part of the ROMWBW boot process in the source and assemble with TASM.
+
+Default test pattern for each port is:
+ 
+1 Toggle all bits on and off. 
+2 Toggle each bit on and off.
+3 Toggle alternate bits on and off.
+
+Only tested with ECB-SBC-V2 and ECP-4PIO.
+
 
