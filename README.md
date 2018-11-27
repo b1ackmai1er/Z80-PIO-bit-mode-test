@@ -22,16 +22,18 @@ https://www.retrobrewcomputers.org/doku.php?id=boards:ecb:4pio:start
 
 Should work with any Z80 system with appropriate configuration.
 
-piociotst.asm - Z80 PIO bit mode test program for CP/M ROMWBW HBIOS - ECB-4PIO board
-------------------------------------------------------------------------------------
+piociotst.asm - Z80 PIO bit mode test program for CP/M ROMWBW HBIOS
+-------------------------------------------------------------------
 
-Version 20-Nov-2018 
+Version 27-Nov-2018 
 Phil Summers
 difficultylevelhigh@gmail.com
 
 This is generic test program for ROMWBW with pio.asm driver - currently not submitted to ROMWBW master.
 
-Set the unit number which are displayed as part of the ROMWBW boot process in the source and assemble with TASM.
+USAGE: PIOCIOTST n
+
+Where n is the device to output the test pattern to.
 
 Default test pattern for each port is:
  
