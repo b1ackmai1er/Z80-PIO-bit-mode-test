@@ -43,4 +43,16 @@ Default test pattern for each port is:
 
 Only tested with ECB-SBC-V2 and ECP-4PIO.
 
+ciomode.asm - Z80 CIO mode program for CP/M ROMWBW HBIOS
+-------------------------------------------------------------------
+
+Version 2-Dec-2018 
+Phil Summers
+difficultylevelhigh@gmail.com
+Some code portions by Wayne Warthen. Thank you.
+Assemble with TASM
+
+USAGE: CIOMODE n
+
+Where n is the unit.
 
